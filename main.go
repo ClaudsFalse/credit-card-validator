@@ -1,9 +1,10 @@
-// main.go
 package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 )
 
 // Response is a struct for representing the JSON response.
@@ -18,7 +19,6 @@ func creditCardValidator(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-
 	// Create a struct to hold the incoming JSON payload.
 	var cardNumber struct {
 		Number string `json:"number"` // Number field holds the credit card number.
@@ -52,9 +52,17 @@ func creditCardValidator(writer http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
+	args := os.Args
+	port := args[1]
+
 	// Register the creditCardValidator function to handle requests at the root ("/") path.
 	http.HandleFunc("/", creditCardValidator)
 
-	// Start an HTTP server listening on port 8080.
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Listening on port:", port) // Print the message before starting the server.
+
+	// Start an HTTP server listening on the specified port.
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		fmt.Println("Error:", err) // Print an error message if the server fails to start.
+	}
 }
